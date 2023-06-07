@@ -1,0 +1,4 @@
+repository "BasicCube@lqmunity@cloud.cn"
+  path "/"
+    br "/main"
+    co "/main"
