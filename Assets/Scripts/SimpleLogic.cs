@@ -21,4 +21,18 @@ public class SimpleLogic : MonoBehaviour
         transform.localEulerAngles = angels;
     }
 
+    private void OnGUI()
+    {
+        if (GUILayout.Button("Speed Up"))
+        {
+            rotateSpeed += 20f;
+        }
+        if (GUILayout.Button("Speed Down"))
+        {
+            if (rotateSpeed > 10f)
+            {
+                rotateSpeed -= 10f;
+            }
+        }
+    }
 }
