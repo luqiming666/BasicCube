@@ -5,18 +5,20 @@ dependencies {
     }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion '30.0.2'
+    ndkPath "D:/Softwares/Unity3D/2022.3.1f1/Editor/Data/PlaybackEngines/AndroidPlayer/NDK"
+
+    compileSdkVersion 32
+    buildToolsVersion '32.0.0'
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     defaultConfig {
         minSdkVersion 22
-        targetSdkVersion 30
-        applicationId 'com.DefaultCompany.BasicCube'
+        targetSdkVersion 32
+        applicationId 'com.ABC.BasicCube'
         ndk {
             abiFilters 'armeabi-v7a'
         }
@@ -26,7 +28,7 @@ android {
 
     aaptOptions {
         noCompress = ['.unity3d', '.ress', '.resource', '.obb', '.bundle', '.unityexp'] + unityStreamingAssets.tokenize(', ')
-        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~"
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~"
     }
 
     lintOptions {
