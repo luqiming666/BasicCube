@@ -21,12 +21,17 @@ public class SimpleLogic : MonoBehaviour
         transform.localEulerAngles = angels;
     }
 
+    // UI布局：https://blog.csdn.net/qq_43511290/article/details/95752308
     private void OnGUI()
     {
+        GUILayout.BeginArea(new Rect(600, 300, 200, 80));//固定布局  //Rect(float x,float y,float width,float height)  
+        GUILayout.BeginHorizontal();//内层嵌套一个横向布局 
+
         if (GUILayout.Button("Speed Up"))
         {
             rotateSpeed += 20f;
         }
+
         if (GUILayout.Button("Speed Down"))
         {
             if (rotateSpeed > 10f)
@@ -34,5 +39,8 @@ public class SimpleLogic : MonoBehaviour
                 rotateSpeed -= 10f;
             }
         }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndArea();
     }
 }
