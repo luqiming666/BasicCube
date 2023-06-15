@@ -24,15 +24,20 @@ public class SimpleLogic : MonoBehaviour
     // UI布局：https://blog.csdn.net/qq_43511290/article/details/95752308
     private void OnGUI()
     {
-        GUILayout.BeginArea(new Rect(600, 300, 200, 80));//固定布局  //Rect(float x,float y,float width,float height)  
+        GUILayout.BeginArea(new Rect(200, 200, 500, 200));//固定布局  //Rect(float x,float y,float width,float height)  
         GUILayout.BeginHorizontal();//内层嵌套一个横向布局 
 
-        if (GUILayout.Button("Speed Up"))
+        GUIStyle style = new GUIStyle(GUI.skin.button);
+        style.border = new RectOffset(5, 5, 5, 5);
+        style.normal.textColor = Color.white;
+        style.fontSize = 32;
+
+        if (GUILayout.Button("Speed Up", style, GUILayout.Width(200), GUILayout.Height(200)))
         {
             rotateSpeed += 20f;
         }
 
-        if (GUILayout.Button("Speed Down"))
+        if (GUILayout.Button("Speed Down", style, GUILayout.Width(200), GUILayout.Height(200)))
         {
             if (rotateSpeed > 10f)
             {
