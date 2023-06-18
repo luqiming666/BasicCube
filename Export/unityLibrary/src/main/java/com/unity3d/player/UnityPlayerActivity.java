@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.os.Debug;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,7 +14,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.os.Process;
 
-public class UnityPlayerActivity extends Activity implements IUnityPlayerLifecycleEvents
+import androidx.appcompat.app.AppCompatActivity;
+
+public class UnityPlayerActivity extends BaseActivity implements IUnityPlayerLifecycleEvents
 {
     protected UnityPlayer mUnityPlayer; // don't change the name of this variable; referenced from native code
 
@@ -29,30 +33,35 @@ public class UnityPlayerActivity extends Activity implements IUnityPlayerLifecyc
     }
 
     // Setup activity layout
-    @Override protected void onCreate(Bundle savedInstanceState)
+    @Override public void onCreate(Bundle savedInstanceState)
     {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
-        String cmdLine = updateUnityCommandLineArguments(getIntent().getStringExtra("unity"));
-        getIntent().putExtra("unity", cmdLine);
+        //String cmdLine = updateUnityCommandLineArguments(getIntent().getStringExtra("unity"));
+        //getIntent().putExtra("unity", cmdLine);
 
-        mUnityPlayer = new UnityPlayer(this, this);
+        Log.d("UnityPlayerActivity", "1");
+        mUnityPlayer = new UnityPlayer(thisContext, this);
         setContentView(mUnityPlayer);
         mUnityPlayer.requestFocus();
+        Log.d("UnityPlayerActivity", "2");
     }
 
     // When Unity player unloaded move task to background
     @Override public void onUnityPlayerUnloaded() {
+        Log.d("UnityPlayerActivity", "3");
         moveTaskToBack(true);
     }
 
     // Callback before Unity player process is killed
     @Override public void onUnityPlayerQuitted() {
+        Log.d("UnityPlayerActivity", "4");
     }
 
     @Override protected void onNewIntent(Intent intent)
     {
+        Log.d("UnityPlayerActivity", "5");
         // To support deep linking, we need to make sure that the client can get access to
         // the last sent intent. The clients access this through a JNI api that allows them
         // to get the intent set on launch. To update that after launch we have to manually
@@ -62,8 +71,9 @@ public class UnityPlayerActivity extends Activity implements IUnityPlayerLifecyc
     }
 
     // Quit Unity
-    @Override protected void onDestroy ()
+    @Override public void onDestroy ()
     {
+        Log.d("UnityPlayerActivity", "6");
         mUnityPlayer.destroy();
         super.onDestroy();
     }
@@ -72,53 +82,68 @@ public class UnityPlayerActivity extends Activity implements IUnityPlayerLifecyc
     // onStart/onStop (the visibility callbacks) to determine when to pause/resume.
     // Otherwise it will be done in onPause/onResume as Unity has done historically to preserve
     // existing behavior.
-    @Override protected void onStop()
+    @Override public void onStop()
     {
+        Log.d("UnityPlayerActivity", "7");
         super.onStop();
 
-        if (!MultiWindowSupport.getAllowResizableWindow(this))
+        if (!MultiWindowSupport.getAllowResizableWindow(thisContext))
             return;
 
         mUnityPlayer.pause();
     }
 
-    @Override protected void onStart()
+    @Override public void onStart()
     {
+        Log.d("UnityPlayerActivity", "8");
         super.onStart();
 
-        if (!MultiWindowSupport.getAllowResizableWindow(this))
+        if (!MultiWindowSupport.getAllowResizableWindow(thisContext)) {
+            Log.d("UnityPlayerActivity", "8-1");
             return;
+        }
 
+        Log.d("UnityPlayerActivity", "8-2");
         mUnityPlayer.resume();
+        Log.d("UnityPlayerActivity", "8-3");
     }
 
     // Pause Unity
-    @Override protected void onPause()
+    @Override public void onPause()
     {
+        Log.d("UnityPlayerActivity", "9");
         super.onPause();
 
-        MultiWindowSupport.saveMultiWindowMode(this);
+        MultiWindowSupport.saveMultiWindowMode(thisContext);
 
-        if (MultiWindowSupport.getAllowResizableWindow(this))
+        if (MultiWindowSupport.getAllowResizableWindow(thisContext))
             return;
 
         mUnityPlayer.pause();
     }
 
     // Resume Unity
-    @Override protected void onResume()
+    @Override public void onResume()
     {
+        Log.d("UnityPlayerActivity", "10");
         super.onResume();
 
-        if (MultiWindowSupport.getAllowResizableWindow(this) && !MultiWindowSupport.isMultiWindowModeChangedToTrue(this))
+        Log.d("UnityPlayerActivity", "10-1");
+        if (MultiWindowSupport.getAllowResizableWindow(thisContext) && !MultiWindowSupport.isMultiWindowModeChangedToTrue(thisContext)) {
+            Log.d("UnityPlayerActivity", "10-2");
             return;
+        }
 
+        Log.d("UnityPlayerActivity", "10-3");
         mUnityPlayer.resume();
+        //mUnityPlayer.postInvalidate();
+        Log.d("UnityPlayerActivity", "10-4");
     }
 
     // Low Memory Unity
     @Override public void onLowMemory()
     {
+        Log.d("UnityPlayerActivity", "11");
         super.onLowMemory();
         mUnityPlayer.lowMemory();
     }
@@ -126,6 +151,7 @@ public class UnityPlayerActivity extends Activity implements IUnityPlayerLifecyc
     // Trim Memory Unity
     @Override public void onTrimMemory(int level)
     {
+        Log.d("UnityPlayerActivity", "12");
         super.onTrimMemory(level);
         if (level == TRIM_MEMORY_RUNNING_CRITICAL)
         {
@@ -136,6 +162,7 @@ public class UnityPlayerActivity extends Activity implements IUnityPlayerLifecyc
     // This ensures the layout will be correct.
     @Override public void onConfigurationChanged(Configuration newConfig)
     {
+        Log.d("UnityPlayerActivity", "13");
         super.onConfigurationChanged(newConfig);
         mUnityPlayer.configurationChanged(newConfig);
     }
@@ -143,6 +170,7 @@ public class UnityPlayerActivity extends Activity implements IUnityPlayerLifecyc
     // Notify Unity of the focus change.
     @Override public void onWindowFocusChanged(boolean hasFocus)
     {
+        Log.d("UnityPlayerActivity", "14");
         super.onWindowFocusChanged(hasFocus);
         mUnityPlayer.windowFocusChanged(hasFocus);
     }
@@ -151,14 +179,23 @@ public class UnityPlayerActivity extends Activity implements IUnityPlayerLifecyc
     // Force event injection by overriding dispatchKeyEvent().
     @Override public boolean dispatchKeyEvent(KeyEvent event)
     {
+        Log.d("UnityPlayerActivity", "15");
         if (event.getAction() == KeyEvent.ACTION_MULTIPLE)
             return mUnityPlayer.injectEvent(event);
         return super.dispatchKeyEvent(event);
     }
 
     // Pass any events not handled by (unfocused) views straight to UnityPlayer
-    @Override public boolean onKeyUp(int keyCode, KeyEvent event)     { return mUnityPlayer.onKeyUp(keyCode, event); }
-    @Override public boolean onKeyDown(int keyCode, KeyEvent event)   { return mUnityPlayer.onKeyDown(keyCode, event); }
-    @Override public boolean onTouchEvent(MotionEvent event)          { return mUnityPlayer.onTouchEvent(event); }
-    @Override public boolean onGenericMotionEvent(MotionEvent event)  { return mUnityPlayer.onGenericMotionEvent(event); }
+    @Override public boolean onKeyUp(int keyCode, KeyEvent event)     {
+        Log.d("UnityPlayerActivity", "16");
+        return mUnityPlayer.onKeyUp(keyCode, event); }
+    @Override public boolean onKeyDown(int keyCode, KeyEvent event)   {
+        Log.d("UnityPlayerActivity", "17");
+        return mUnityPlayer.onKeyDown(keyCode, event); }
+    @Override public boolean onTouchEvent(MotionEvent event)          {
+        Log.d("UnityPlayerActivity", "18");
+        return mUnityPlayer.onTouchEvent(event); }
+    @Override public boolean onGenericMotionEvent(MotionEvent event)  {
+        Log.d("UnityPlayerActivity", "19");
+        return mUnityPlayer.onGenericMotionEvent(event); }
 }
